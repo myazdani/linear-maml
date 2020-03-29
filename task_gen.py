@@ -1,21 +1,25 @@
 import numpy as np
 
 class TaskGenerator:
-    def __init__(self, d):
+    def __init__(self, d, rank = 2):
         
         self.d = d
         u, s, vt = np.linalg.svd(np.random.randn(self.d,self.d))
-        s[1] = s[0]/2
-        s[2:] = 0
+        for i in range(rank):
+            if (i+1) == d:
+                break
+            s[i+1] = s[0]/(i+2)
+            
+        s[rank:] = 0
         self.omega = u @ np.diag(s) @ vt
 
     def sample_task(self):
 
-        alpha = np.random.randn(self.d)
+        alpha = np.hstack([1, np.random.randn(self.d - 1)])
 
         w_star = self.omega@alpha 
 
-        return w_star + 1
+        return w_star + np.random.randn(self.d)
 
     
 class DataGenerator:
